@@ -2,9 +2,9 @@ from PySide6.QtWidgets import (
     QVBoxLayout, QWidget, QPushButton, QMainWindow
 )
 
-from ..data import Teacher, Subject, Data
+from ..data import Teacher, SubjectPartition, Data
 from .editor import EditorWindow
-from ..data import Curriculum, ScheduledSubject, Room, RoomGroup, Group, Lesson
+from ..data import Curriculum, ScheduledSubject, Room, RoomGroup, Group, Lesson, SubjectTitle
 
 
 class MainWindow(QMainWindow):
@@ -20,7 +20,8 @@ class MainWindow(QMainWindow):
         buttons_dict = {Curriculum: "Перечень учебных планов",
                         Group: "Группы",
                         Teacher: "Преподаватели",
-                        Subject: "Перечень всех предметов",
+                        SubjectTitle: "Названия предметов",
+                        SubjectPartition: "Разделение",
                         ScheduledSubject: "Заполнение учебных планов",
                         Room: "Перечень всех аудитории",
                         RoomGroup: "Категории аудиторий",

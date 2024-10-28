@@ -5,7 +5,7 @@ from functools import reduce
 from sqlalchemy.orm import Session
 
 from ..task import ObservableTask, ObservableTaskResult
-from ...data import Data, Teacher, Curriculum, Subject, ScheduledSubject, Time, Day, Group, LessonType, Lesson, Room
+from ...data import Data, Teacher, Curriculum, SubjectPartition, ScheduledSubject, Time, Day, Group, LessonType, Lesson, Room
 
 
 class ComposerTask(ObservableTask):
@@ -49,8 +49,8 @@ class ComposerTask(ObservableTask):
                 for subject_for_term in subjects_for_term:
                     subject_for_term: ScheduledSubject = subject_for_term
 
-                    subject_itself: Optional[Subject] = self._session.query(Subject).filter_by(
-                        id=subject_for_term.subject_id).first()
+                    subject_itself: Optional[SubjectPartition] = self._session.query(SubjectPartition).filter_by(
+                        id=subject_for_term.subject_partition_id).first()
                     
                     if subject_itself is None:
                         continue
@@ -65,19 +65,20 @@ class ComposerTask(ObservableTask):
 
                     allowed_rooms = list(reduce(lambda a, b: set(a).intersection(b), allowed_rooms_list))
 
-                    if subject_itself is not None:
-                        teacher = random.choice(allowed_teachers)
-                        time = random.choice(times)
-                        room = random.choice(allowed_rooms)
-                        day = random.choice(days)
-                        lesson = Lesson(
-                            group_id=group.id,
-                            subject_id=subject_itself.id,
-                            time_id=time.id,
-                            teacher_id=teacher.id,
-                            room_id=room.id,
-                            day_id=day.id
-                        )
+                    for i in range(subject_for_term.count):
+                        if subject_itself is not None:
+                            teacher = random.choice(allowed_teachers)
+                            time = random.choice(times)
+                            room = random.choice(allowed_rooms)
+                            day = random.choice(days)
+                            lesson = Lesson(
+                                group_id=group.id,
+                                subject_partition_id=subject_itself.id,
+                                time_id=time.id,
+                                teacher_id=teacher.id,
+                                room_id=room.id,
+                                day_id=day.id
+                            )
                         schedule.append(lesson)
 
         return schedule
@@ -85,7 +86,7 @@ class ComposerTask(ObservableTask):
     def mutate(self, schedule):
         index = random.randint(0, len(schedule) - 1)
         lesson = schedule[index]
-        subject = self._session.query(Subject).filter_by(id=lesson.subject_id).first()
+        subject = self._session.query(SubjectPartition).filter_by(id=lesson.subject_partition_id).first()
 
         if subject is None:
             return
@@ -123,7 +124,7 @@ class ComposerTask(ObservableTask):
             teacher_id = lesson.teacher_id
             day_id = lesson.day_id
             time_id = lesson.time_id
-            subject_id = lesson.subject_id
+            subject_id = lesson.subject_partition_id
             group_id = lesson.group_id
 
             if (teacher_id, day_id, time_id) in teacher_for_time:
@@ -207,7 +208,7 @@ class ComposerTask(ObservableTask):
                     for time in times:
                         lessons_for_time = tuple(lesson for lesson in lessons_for_day if lesson.time_id == time.id)
                         for lesson in lessons_for_time:
-                            subject = self._session.query(Subject).filter_by(id=lesson.subject_id).first()
+                            subject = self._session.query(SubjectPartition).filter_by(id=lesson.subject_partition_id).first()
                             if subject is None:
                                 continue
 

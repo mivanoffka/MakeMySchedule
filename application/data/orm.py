@@ -8,13 +8,13 @@ DECLARATIVE_BASE = declarative_base()
 teacher_subject_association = Table(
     'teacher_subject', DECLARATIVE_BASE.metadata,
     Column('teacher_id', Integer, ForeignKey('teachers.id'), nullable=True),
-    Column('subject_id', Integer, ForeignKey('subjects.id'), nullable=True),
+    Column('subject_id', Integer, ForeignKey('subject_partitions.id'), nullable=True),
 )
 
-room_types_subjects_association = Table(
-    'room_groups_to_subjects', DECLARATIVE_BASE.metadata,
+room_types_subject_partitions_association = Table(
+    'room_groups_to_subject_partitions', DECLARATIVE_BASE.metadata,
     Column('room_group_id', Integer, ForeignKey('room_groups.id'), nullable=True),
-    Column('subject_id', Integer, ForeignKey('subjects.id'), nullable=True),
+    Column('subject_id', Integer, ForeignKey('subject_partitions.id'), nullable=True),
 )
 
 class Group(DECLARATIVE_BASE):
@@ -52,7 +52,7 @@ class Teacher(DECLARATIVE_BASE):
     second_name = Column(String)
     last_name = Column(String)
 
-    subjects = relationship('Subject', secondary=teacher_subject_association, back_populates='teachers')
+    subject_partitions = relationship('SubjectPartition', secondary=teacher_subject_association, back_populates='teachers')
 
 class LessonType(DECLARATIVE_BASE):
     __tablename__ = 'lesson_types'
@@ -60,16 +60,30 @@ class LessonType(DECLARATIVE_BASE):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-class Subject(DECLARATIVE_BASE):
-    __tablename__ = 'subjects'
+class SubjectTitle(DECLARATIVE_BASE):
+    __tablename__ = "subject_titles"
+
+    id = Column(Integer, primary_key=True)
+    value = Column(String)
+
+    partitions = relationship("SubjectPartition", back_populates="title")
+
+
+class SubjectPartition(DECLARATIVE_BASE):
+    __tablename__ = 'subject_partitions'
 
     id = Column(Integer, primary_key=True)
     lesson_type_id = Column(Integer, ForeignKey('lesson_types.id'))
-    # name = Column(String, default="Новый предмет")
-    name = Column(String)
+    title_id = Column(Integer, ForeignKey('subject_titles.id'))
 
-    teachers = relationship('Teacher', secondary=teacher_subject_association, back_populates='subjects')
-    room_groups = relationship("RoomGroup", secondary=room_types_subjects_association, back_populates='subjects')
+    title = relationship("SubjectTitle", back_populates="partitions")
+
+    @property
+    def name(self):
+        return self.title.value
+
+    teachers = relationship('Teacher', secondary=teacher_subject_association, back_populates='subject_partitions')
+    room_groups = relationship("RoomGroup", secondary=room_types_subject_partitions_association, back_populates='subject_partitions')
 
 class ScheduledSubject(DECLARATIVE_BASE):
     __tablename__ = 'scheduled_subjects'
@@ -77,7 +91,7 @@ class ScheduledSubject(DECLARATIVE_BASE):
     id = Column(Integer, primary_key=True)
     curriculum_id = Column(Integer, ForeignKey('curricula.id'))
     term_number_id = Column(Integer, ForeignKey('term_numbers.id'))
-    subject_id = Column(Integer, ForeignKey('subjects.id'))
+    subject_partition_id = Column(Integer, ForeignKey('subject_partitions.id'))
     count = Column(Integer, default=1)
 
 
@@ -112,7 +126,7 @@ class RoomGroup(DECLARATIVE_BASE):
     name = Column(String)
 
     rooms = relationship("Room", secondary=room_groups_association, back_populates='groups')
-    subjects = relationship("Subject", secondary=room_types_subjects_association, back_populates="room_groups")
+    subject_partitions = relationship("SubjectPartition", secondary=room_types_subject_partitions_association, back_populates="room_groups")
 
 class Lesson(DECLARATIVE_BASE):
     __tablename__ = "lessons"
@@ -122,7 +136,7 @@ class Lesson(DECLARATIVE_BASE):
     group_id = Column(Integer, ForeignKey("groups.id"))
     day_id = Column(Integer, ForeignKey("days.id"))
     time_id = Column(Integer, ForeignKey("times.id"))
-    subject_id = Column(Integer, ForeignKey("subjects.id"))
+    subject_partition_id = Column(Integer, ForeignKey("subject_partitions.id"))
     teacher_id = Column(Integer, ForeignKey("teachers.id"))
     room_id = Column(Integer, ForeignKey("rooms.id"))
 

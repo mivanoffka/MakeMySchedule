@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import Any, Dict
 
 from ..utitily import SillyDB
-from .orm import (DECLARATIVE_BASE, Subject, Curriculum, Teacher, ScheduledSubject,
-                   Room, RoomGroup, TermNumber, Time, Day, LessonType, Group, Lesson)
+from .orm import (DECLARATIVE_BASE, SubjectPartition, Curriculum, Teacher, ScheduledSubject,
+                   Room, RoomGroup, TermNumber, Time, Day, LessonType, Group, Lesson, SubjectTitle)
 from .descriptions import ColumnDescription, ListColumnDescription, ForeignKeyColumnDescription, TableDescription
 
-def represent_subject(obj: Subject):
+def represent_subject(obj: SubjectPartition):
     annotation = ""
     match obj.lesson_type_id:
         case 1:
@@ -27,10 +27,13 @@ class Data(SillyDB):
             ColumnDescription("last_name", "Фамилия"),
             ColumnDescription("first_name", "Имя"),
             ColumnDescription("second_name", "Отчество"),
-            ListColumnDescription(Subject, "subjects", "Может преподавать дисциплины", represent_subject)
+            ListColumnDescription(SubjectPartition, "subject_partitions", "Может преподавать дисциплины", represent_subject)
         ),
-        Subject: TableDescription("Дисциплины",
-            ColumnDescription("name", "Название"),
+        SubjectTitle: TableDescription("Дисциплины",
+                        ColumnDescription("value", "Название")),
+        
+        SubjectPartition: TableDescription("Дисциплины",
+            ForeignKeyColumnDescription(SubjectTitle, "title_id", "Название"),
             ForeignKeyColumnDescription(LessonType, "lesson_type_id", "Форма"),
             ListColumnDescription(Teacher, "teachers", "Преподаватели этой дисциплины",
                                   lambda obj: f"{obj.last_name} {obj.first_name[0]}. {obj.second_name[0]}."),
@@ -44,7 +47,7 @@ class Data(SillyDB):
             "Предметы",
             ForeignKeyColumnDescription(Curriculum, "curriculum_id", "Учебный план", as_filter=True),
             ForeignKeyColumnDescription(TermNumber, "term_number_id", "Семестр", as_filter=True),
-            ForeignKeyColumnDescription(Subject, "subject_id", "Название", represent_subject),
+            ForeignKeyColumnDescription(SubjectPartition, "subject_partition_id", "Название", represent_subject),
             ColumnDescription("count", "Количество")
         ),
 
@@ -58,14 +61,14 @@ class Data(SillyDB):
             "Категории аудиторий",
             ColumnDescription("name", "Название"),
             ListColumnDescription(Room, "rooms", "Аудитории", lambda obj: f"к. {obj.building}, а. {obj.room}"),
-            ListColumnDescription(Subject, "subjects", "Дисциплины", represent_subject)),
+            ListColumnDescription(SubjectPartition, "subject_partitions", "Дисциплины", represent_subject)),
 
         Lesson: TableDescription(
             "Расписание", 
             ForeignKeyColumnDescription(Group, "group_id", "Группа", as_filter=True),
             ForeignKeyColumnDescription(Day, "day_id", "День", as_filter=True),
             ForeignKeyColumnDescription(Time, "time_id", "Время"),
-            ForeignKeyColumnDescription(Subject, "subject_id", "Предмет", represent=represent_subject),
+            ForeignKeyColumnDescription(SubjectPartition, "subject_partition_id", "Предмет", represent=represent_subject),
             ForeignKeyColumnDescription(Teacher, "teacher_id", "Преподаватель", represent=lambda obj: f"{obj.last_name} {obj.first_name[0]}. {obj.second_name[0]}."),
             ForeignKeyColumnDescription(Room, "room_id", "Аудитория", represent=lambda obj: f"к. {obj.building}, а. {obj.room}")
 
