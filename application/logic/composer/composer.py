@@ -127,14 +127,12 @@ class ComposerTask(ObservableTask):
             group_id = lesson.group_id
 
             if (teacher_id, day_id, time_id) in teacher_for_time:
-                score -= 1  # штраф за пересечение учителя
+                score -= 1 
             else:
                 teacher_for_time[(teacher_id, day_id, time_id)] = subject_id
 
-            # Проверка на занятость комнаты в тот же день и время
             if (room_id, day_id, time_id) in room_for_time:
-                score -= 1  # штраф за пересечение комнаты
-            else:
+                score -= 1
                 room_for_time[(room_id, day_id, time_id)] = subject_id
 
             if (group_id, day_id, time_id) in group_for_time:

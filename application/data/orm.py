@@ -21,6 +21,7 @@ class Group(DECLARATIVE_BASE):
     __tablename__ = "groups"
 
     id = Column(Integer, primary_key=True)
+    curriculum_id = Column(Integer, ForeignKey("curricula.id"))
     name = Column(String, default="Новая группа")
 
 class Curriculum(DECLARATIVE_BASE):
@@ -117,3 +118,12 @@ class Lesson(DECLARATIVE_BASE):
     __tablename__ = "lessons"
 
     id = Column(Integer, primary_key=True)
+
+    group_id = Column(Integer, ForeignKey("groups.id"))
+    day_id = Column(Integer, ForeignKey("days.id"))
+    time_id = Column(Integer, ForeignKey("times.id"))
+    subject_id = Column(Integer, ForeignKey("subjects.id"))
+    teacher_id = Column(Integer, ForeignKey("teachers.id"))
+    room_id = Column(Integer, ForeignKey("rooms.id"))
+
+

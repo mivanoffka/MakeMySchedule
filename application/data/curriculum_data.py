@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 from ..utitily import SillyDB
 from .orm import (DECLARATIVE_BASE, Subject, Curriculum, Teacher, ScheduledSubject,
-                   Room, RoomGroup, TermNumber, Time, Day, LessonType)
+                   Room, RoomGroup, TermNumber, Time, Day, LessonType, Group, Lesson)
 from .descriptions import ColumnDescription, ListColumnDescription, ForeignKeyColumnDescription, TableDescription
 
 def represent_subject(obj: Subject):
@@ -36,6 +36,9 @@ class Data(SillyDB):
                                   lambda obj: f"{obj.last_name} {obj.first_name[0]}. {obj.second_name[0]}."),
             ListColumnDescription(RoomGroup, "room_groups", "Категории аудиторий", lambda obj: obj.name),
         ),
+        Group: TableDescription("Группы", 
+                                ColumnDescription("name", 'Название'),
+                                ForeignKeyColumnDescription(Curriculum, "curriculum_id", "Специальность")),
 
         ScheduledSubject: TableDescription(
             "Предметы",
@@ -55,7 +58,19 @@ class Data(SillyDB):
             "Категории аудиторий",
             ColumnDescription("name", "Название"),
             ListColumnDescription(Room, "rooms", "Аудитории", lambda obj: f"к. {obj.building}, а. {obj.room}"),
-            ListColumnDescription(Subject, "subjects", "Дисциплины", represent_subject))
+            ListColumnDescription(Subject, "subjects", "Дисциплины", represent_subject)),
+
+        Lesson: TableDescription(
+            "Расписание", 
+            ForeignKeyColumnDescription(Group, "group_id", "Группа", as_filter=True),
+            ForeignKeyColumnDescription(Day, "day_id", "День", as_filter=True),
+            ForeignKeyColumnDescription(Time, "time_id", "Время"),
+            ForeignKeyColumnDescription(Subject, "subject_id", "Предмет", represent=represent_subject),
+            ForeignKeyColumnDescription(Teacher, "teacher_id", "Преподаватель", represent=lambda obj: f"{obj.last_name} {obj.first_name[0]}. {obj.second_name[0]}."),
+            ForeignKeyColumnDescription(Room, "room_id", "Аудитория", represent=lambda obj: f"к. {obj.building}, а. {obj.room}")
+
+
+        )
     }
 
     @property

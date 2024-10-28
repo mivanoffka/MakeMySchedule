@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
 
 from ..data import Teacher, Subject, Data
 from .editor import EditorWindow
-from ..data import Curriculum, ScheduledSubject, Room, RoomGroup
+from ..data import Curriculum, ScheduledSubject, Room, RoomGroup, Group, Lesson
 
 
 class MainWindow(QMainWindow):
@@ -18,11 +18,13 @@ class MainWindow(QMainWindow):
         self.buttons = []
 
         buttons_dict = {Curriculum: "Перечень учебных планов",
+                        Group: "Группы",
                         Teacher: "Преподаватели",
                         Subject: "Перечень всех предметов",
                         ScheduledSubject: "Заполнение учебных планов",
                         Room: "Перечень всех аудитории",
-                        RoomGroup: "Категории аудиторий"
+                        RoomGroup: "Категории аудиторий",
+                        Lesson: "Расписание"
                         }
 
         for key in buttons_dict.keys():
