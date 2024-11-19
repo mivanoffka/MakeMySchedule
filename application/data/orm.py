@@ -52,7 +52,8 @@ class Teacher(DECLARATIVE_BASE):
     second_name = Column(String)
     last_name = Column(String)
 
-    subject_partitions = relationship('SubjectPartition', secondary=teacher_subject_association, back_populates='teachers')
+    subject_partitions = relationship('SubjectPartition', secondary=teacher_subject_association,
+                                      back_populates='teachers')
 
 class LessonType(DECLARATIVE_BASE):
     __tablename__ = 'lesson_types'
@@ -83,7 +84,8 @@ class SubjectPartition(DECLARATIVE_BASE):
         return self.title.value
 
     teachers = relationship('Teacher', secondary=teacher_subject_association, back_populates='subject_partitions')
-    room_groups = relationship("RoomGroup", secondary=room_types_subject_partitions_association, back_populates='subject_partitions')
+    room_groups = relationship("RoomGroup", secondary=room_types_subject_partitions_association,
+                               back_populates='subject_partitions')
 
 class ScheduledSubject(DECLARATIVE_BASE):
     __tablename__ = 'scheduled_subjects'
@@ -126,7 +128,8 @@ class RoomGroup(DECLARATIVE_BASE):
     name = Column(String)
 
     rooms = relationship("Room", secondary=room_groups_association, back_populates='groups')
-    subject_partitions = relationship("SubjectPartition", secondary=room_types_subject_partitions_association, back_populates="room_groups")
+    subject_partitions = relationship("SubjectPartition", secondary=room_types_subject_partitions_association,
+                                      back_populates="room_groups")
 
 class Lesson(DECLARATIVE_BASE):
     __tablename__ = "lessons"
@@ -139,5 +142,3 @@ class Lesson(DECLARATIVE_BASE):
     subject_partition_id = Column(Integer, ForeignKey("subject_partitions.id"))
     teacher_id = Column(Integer, ForeignKey("teachers.id"))
     room_id = Column(Integer, ForeignKey("rooms.id"))
-
-

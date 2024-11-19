@@ -141,7 +141,6 @@ class ComposerTask(ObservableTask):
             else:
                 group_for_time[(group_id, day_id, time_id)] = group_id
 
-
         return score
 
     def crossover(self, first, second):
@@ -157,11 +156,11 @@ class ComposerTask(ObservableTask):
         for generation in range(self._generations_count):
             self._schedules.sort(key=lambda schedule: self.check(schedule), reverse=True)
 
-            print(f'Generation {generation+1}: Best fitness {self.check(self._schedules[0])}')
+            self.make_message(f'Generation {generation + 1}: Best fitness {self.check(self._schedules[0])}')
 
             # Если найдено хорошее решение
             if self.check(self._schedules[0]) == 0 or generation == self._generations_count - 1:
-                self.print_schedule(self._schedules[0])
+                # self.print_schedule(self._schedules[0])
                 self._best_schedule = self._schedules[0]
                 self.save_to_db()
                 break

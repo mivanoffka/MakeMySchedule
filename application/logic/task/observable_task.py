@@ -11,8 +11,8 @@ class ObservableTask:
     should not be an OBSERVABLE TASK.
     """
 
-    __recent_messages: List[Any]
-    __total_messages: List[Any]
+    __recent_messages: List[Any] = []
+    __total_messages: List[Any] = []
 
     def make_message(self, message: Any):
         logging.warning(message)
