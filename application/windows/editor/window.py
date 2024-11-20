@@ -1,5 +1,9 @@
 from PySide6.QtWidgets import QHBoxLayout, QWidget, QMainWindow
 
+from application.data.orm import Lesson
+from application.windows.editor.schedule_table.day_widget import ScheduleDayWidget
+from application.windows.editor.schedule_table.table_widget import ScheduleTableWidget
+
 from ...data import TableDescription, ListColumnDescription
 from .related_table import RelatedTableWidget
 from .primary_table import PrimaryTableWidget
@@ -31,12 +35,21 @@ class EditorWindow(QMainWindow):
 
         self.visible_columns = self._table_description.regular_columns()
 
-        self.primary_table_widget = PrimaryTableWidget(
-            session=self.session,
-            orm_class=self.orm_class,
-            visible_columns=self.visible_columns,
-            table_title=self._table_description.displayed_name
-        )
+        if orm_class != Lesson:
+            self.primary_table_widget = PrimaryTableWidget(
+                session=self.session,
+                orm_class=self.orm_class,
+                visible_columns=self.visible_columns,
+                table_title=self._table_description.displayed_name
+            )
+        else:
+            self.primary_table_widget = ScheduleTableWidget(
+                session=self.session,
+                orm_class=self.orm_class,
+                visible_columns=self.visible_columns,
+                table_title=self._table_description.displayed_name
+            )
+            
         self._main_layout.addWidget(self.primary_table_widget, 2)
 
         self.related_widgets = []

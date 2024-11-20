@@ -65,7 +65,9 @@ class PrimaryTableModel(QAbstractTableModel):
         self.beginResetModel()
         self.data_rows = self._fetch_data()
         self.original_data_rows = self.data_rows.copy()
+
         self.endResetModel()
+        
 
     def reset_data(self):
         """Reset data rows to the original unfiltered state."""
@@ -85,7 +87,7 @@ class PrimaryTableModel(QAbstractTableModel):
         for column, selected_value in self.filter.items():
             if selected_value is not None:
                 if isinstance(column, ForeignKeyColumnDescription):
-                    # # For foreign key columns, filter by related object
+                    # For foreign key columns, filter by related object
                     _all = self.session.query(column.orm_type).all()
                     _all_satisfied = [obj for obj in _all if column.represent(obj) == selected_value]
                     if _all_satisfied:
@@ -99,10 +101,23 @@ class PrimaryTableModel(QAbstractTableModel):
                                      getattr(row, column.attribute) == selected_value]
 
         self.data_rows = filtered_rows
+
         self.endResetModel()
 
     def update_data(self, new_data):
         """Update the data of the model."""
         self.beginResetModel()
         self.data_rows = new_data
+        self.endResetModel()
+
+    def sort(self, column, order):
+        """Sort the data based on a column."""
+        self.beginResetModel()
+        column_attr = self.visible_columns[column].attribute
+
+        if order == Qt.SortOrder.AscendingOrder:
+            self.data_rows.sort(key=lambda x: getattr(x, column_attr) or "")
+        else:
+            self.data_rows.sort(key=lambda x: getattr(x, column_attr) or "", reverse=True)
+
         self.endResetModel()

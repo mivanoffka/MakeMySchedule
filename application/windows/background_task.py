@@ -16,7 +16,6 @@ from .message_window import MessageWindow
 
 
 class _BackgroundTaskWorker(QObject):
-
     """
     Objects of this class are only meant to be inherited by
     InternalServerBackgroundTask so that _ProgressWorker could be included and
@@ -48,7 +47,6 @@ class _BackgroundTaskWorker(QObject):
 
 
 class _ProgressWorker(QObject):
-
     """
     Objects of this class are only meant to be included and define
     a loop that will track and update progress indicators in a WidgetForShowingProgress
@@ -85,7 +83,6 @@ class _ProgressWorker(QObject):
 
 
 class BackgroundTask(_BackgroundTaskWorker):
-
     """
     This class can be used to execute an ObservableTask and track its progress
     without interrupting the GUI mainloop, yet the way of parallel execution is not implemented.

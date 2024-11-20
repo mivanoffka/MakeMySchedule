@@ -30,9 +30,10 @@ class PrimaryTableWidget(QWidget):
         self.table_view.verticalHeader().setDefaultSectionSize(20)
         self.model = PrimaryTableModel(self.session, self.orm_class, self.visible_columns)
         self.table_view.setModel(self.model)
+        self.table_view.setSortingEnabled(True)
         self.table_view.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.table_view.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-
+        
         self.table_group_box = QGroupBox(table_title)
         self.table_group_box.setLayout(QVBoxLayout())
         self.table_group_box.layout().addWidget(self.table_view)
@@ -61,6 +62,7 @@ class PrimaryTableWidget(QWidget):
             if column in self.filter_columns:
                 self.table_view.setColumnHidden(i, True)
         self.filter_widgets = {}
+        self.filter_widgets_list = []
 
         self.filters_layout = QHBoxLayout()
         if self.filter_columns:
@@ -85,6 +87,7 @@ class PrimaryTableWidget(QWidget):
             combo_box.currentTextChanged.connect(self.filter)
             self.filters_layout.addLayout(combo_box_layout)
             self.filter_widgets[column] = combo_box
+            self.filter_widgets_list.append(combo_box)
 
         self.filter()
 
@@ -160,3 +163,6 @@ class PrimaryTableWidget(QWidget):
             if is_empty:
                 return True
         return False
+    
+    def sort(self, index):
+        self.table_view.sortByColumn(index, Qt.SortOrder.AscendingOrder)
