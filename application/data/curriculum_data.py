@@ -20,6 +20,22 @@ def represent_subject(obj: SubjectPartition):
     return obj.name + annotation
 
 class Data(SillyDB):
+    @property
+    def path(self):
+        return self._path
+
+
+    @path.setter
+    def path(self, name):
+        self._path = name
+
+        self.set_source()
+
+        self.make_terms()
+        self.make_lesson_types()
+        self.make_times()
+        self.make_days()
+
     _table_descriptions: Dict[Any, TableDescription] = {
         Curriculum: TableDescription("Учебные планы", ColumnDescription("name", "Название")),
         Teacher: TableDescription(
@@ -115,10 +131,6 @@ class Data(SillyDB):
                     time = Day(value=item)
                     session.add(time)
 
-
     def __init__(self, db_file_name: str):
-        super().__init__(db_file_name, DECLARATIVE_BASE)
-        self.make_terms()
-        self.make_lesson_types()
-        self.make_times()
-        self.make_days()
+        super().__init__(DECLARATIVE_BASE)
+

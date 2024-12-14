@@ -67,7 +67,6 @@ class PrimaryTableModel(QAbstractTableModel):
         self.original_data_rows = self.data_rows.copy()
 
         self.endResetModel()
-        
 
     def reset_data(self):
         """Reset data rows to the original unfiltered state."""

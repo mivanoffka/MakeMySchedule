@@ -62,16 +62,3 @@ class EditorWindow(QMainWindow):
                 self._main_layout.addWidget(widget, 1)
                 self.primary_table_widget.selection_changed.connect(widget.update_table)
                 self.related_widgets.append(widget)
-
-    def closeEvent(self, event):
-
-        """Переопределяем событие закрытия окна."""
-        if self.primary_table_widget.has_empty_rows():
-            # Выводим предупреждение пользователю
-            MessageWindow.show_warning("Прежде чем выйти, заполните пустые строки, либо удалите их.")
-
-            # Блокируем закрытие окна
-            event.ignore()
-        else:
-            # Разрешаем закрытие окна
-            event.accept()

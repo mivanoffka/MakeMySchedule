@@ -1,5 +1,5 @@
 import random
-from typing import Dict, Any, List, Optional, Sequence
+from typing import Dict, Any, List, Optional, Sequence, Tuple
 from functools import reduce
 
 from sqlalchemy.orm import Session
@@ -62,19 +62,15 @@ class ComposerTask(ObservableTask):
 
     def __init__(
         self,
-        in_file: str,
-        out_file: str,
+        data: Data,
         population_size: int,
         generations_count: int,
         mutation_rate: float,
-    ):
-        self._curriculum_data = Data(in_file)
+    ):  
+        self._curriculum_data = data
         self._session = self._curriculum_data.get_session()
-
-        self._in_file = in_file
-        self._out_file = out_file
-        self._population_size = population_size
-        self._generations_count = generations_count
+        self._population_size = int(population_size)
+        self._generations_count = int(generations_count)
         self._mutation_rate = mutation_rate
         self._schedules = []
 
@@ -222,9 +218,9 @@ class ComposerTask(ObservableTask):
     def check(self, schedule):
         score = 0
 
-        teacher_for_time = {}
-        room_for_time = {}
-        group_for_time = {}
+        teacher_for_time = []
+        room_for_time = []
+        group_for_time = []
 
         for lesson in schedule:
             room_id = lesson.room_id
@@ -237,16 +233,21 @@ class ComposerTask(ObservableTask):
             if (teacher_id, day_id, time_id) in teacher_for_time:
                 score -= 1
             else:
-                teacher_for_time[(teacher_id, day_id, time_id)] = subject_id
+                teacher_for_time.append((teacher_id, day_id, time_id))
 
             if (room_id, day_id, time_id) in room_for_time:
                 score -= 1
-                room_for_time[(room_id, day_id, time_id)] = subject_id
+                room_for_time.append((room_id, day_id, time_id))
 
-            if (group_ids, day_id, time_id) in group_for_time:
-                score -= 1
-            else:
-                group_for_time[(group_ids, day_id, time_id)] = group_ids
+            tuples = tuple((group_id, day_id, time_id) for group_id in group_ids)
+            
+            for group_id in group_ids:
+                if (group_id, day_id, time_id) in group_for_time:
+                    score -= 1
+                else:
+                    for t in tuples:
+                        group_for_time.append(t)
+                    break
 
         return score
 
