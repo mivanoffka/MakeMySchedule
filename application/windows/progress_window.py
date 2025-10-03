@@ -2,11 +2,21 @@ from datetime import timedelta
 from typing import Optional, Any
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QDialog, QWidget, QDialogButtonBox, QVBoxLayout, QHBoxLayout,
-                               QLabel, QProgressBar, QTextEdit)
+from PySide6.QtWidgets import (
+    QDialog,
+    QWidget,
+    QDialogButtonBox,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QProgressBar,
+    QTextEdit,
+)
 
 
 from PySide6.QtCore import QThread
+
+from .message_window import MessageWindow
 from .widget_for_showing_progress import IWidgetForShowingProgress
 from .background_task import BackgroundTask
 from ..logic import ObservableTask
@@ -37,7 +47,9 @@ class ProgressWindow(QDialog, IWidgetForShowingProgress):
     def on_task_finish(self, result: Any):
         self.__execution_result = result[0]
         self.__duration = result[1]
-        # self.close()
+
+        if isinstance(result[0], Exception):
+            MessageWindow.show_error(str(result[0]))
 
     def __init__(self, parent, task: ObservableTask):
         super().__init__(parent=parent)

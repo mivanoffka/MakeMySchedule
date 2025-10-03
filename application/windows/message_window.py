@@ -7,8 +7,8 @@ from PySide6.QtWidgets import *
 
 from .enums import MessageResult, MessageType
 
-class MessageWindow(QDialog):
 
+class MessageWindow(QDialog):
     """
     A custom MessageBox instead of qt-builtins that are platform-dependent.
 
@@ -23,7 +23,14 @@ class MessageWindow(QDialog):
     def message_result(self):
         return self._message_result
 
-    def __init__(self, message, title="Сообщение", icon_emoji: str = "ℹ️", action_on_closed=None, message_type: MessageType = MessageType.OK):
+    def __init__(
+        self,
+        message,
+        title="Сообщение",
+        icon_emoji: str = "ℹ️",
+        action_on_closed=None,
+        message_type: MessageType = MessageType.OK,
+    ):
         super().__init__()
 
         self.__main_widget = QWidget()
@@ -37,7 +44,7 @@ class MessageWindow(QDialog):
         self.__main_layout.addLayout(self.__icon_and_message_layout)
 
         self.__icon_label = QLabel(icon_emoji)
-        self.__icon_label.setStyleSheet("font-size: 48px;")
+        self.__icon_label.setStyleSheet("font-size: 36px;")
         self.__icon_and_message_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.__icon_and_message_layout.addWidget(self.__icon_label, 1)
@@ -52,7 +59,7 @@ class MessageWindow(QDialog):
         self.__main_layout.addLayout(self.__buttons_layout)
         self._init_buttons(message_type)
 
-        height_delta = 24
+        height_delta = 48
         line_len = 32
         height = height_delta * len(message) // line_len
         self.__message_label.setFixedHeight(height)
@@ -89,15 +96,21 @@ class MessageWindow(QDialog):
         self.close()
 
     @staticmethod
-    def show_confirmation(message, title="Вопрос", icon_emoji="❓", action_on_closed=None):
-        message_window = MessageWindow(message, title, icon_emoji, action_on_closed, message_type=MessageType.YesNo)
+    def show_confirmation(
+        message, title="Вопрос", icon_emoji="❓", action_on_closed=None
+    ):
+        message_window = MessageWindow(
+            message, title, icon_emoji, action_on_closed, message_type=MessageType.YesNo
+        )
         MessageWindow.windows_container.append(message_window)
         message_window.exec()
 
         return message_window.message_result
 
     @staticmethod
-    def show_informative(message, title="Сообщение", icon_emoji="ℹ️", action_on_closed=None):
+    def show_informative(
+        message, title="Сообщение", icon_emoji="ℹ️", action_on_closed=None
+    ):
         message_window = MessageWindow(message, title, icon_emoji, action_on_closed)
         MessageWindow.windows_container.append(message_window)
         message_window.exec()
@@ -119,4 +132,3 @@ class MessageWindow(QDialog):
         message_window.show()
 
         return message_window
-

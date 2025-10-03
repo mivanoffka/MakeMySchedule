@@ -26,6 +26,7 @@ class _BackgroundTaskWorker(QObject):
 
     finished: Signal = Signal()
     result = None
+    error = None
 
     @abstractmethod
     def execute(self):
@@ -37,13 +38,7 @@ class _BackgroundTaskWorker(QObject):
         raise NotImplementedError()
 
     def run(self):
-        try:
-            self.result = self.execute()
-
-        except Exception as error:
-            MessageWindow.show_error(str(error))
-
-        self.finished.emit()
+        self.result = self.execute()
 
 
 class _ProgressWorker(QObject):
@@ -147,7 +142,12 @@ class BackgroundTask(_BackgroundTaskWorker):
 
     def execute(self):
         self._start_time = datetime.now()
-        result = self._task.execute()
+        try:
+            result = self._task.execute()
+        except Exception as exception:
+            self._finish_time = datetime.now()
+            return exception
+
         self._finish_time = datetime.now()
 
         return result

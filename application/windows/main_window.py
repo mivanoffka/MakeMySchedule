@@ -78,7 +78,6 @@ class MainWindow(QMainWindow):
                 },
             },
             {
-
                 "Дисциплины и преподаватели": {
                     Teacher: "Преподаватели",
                     SubjectTitle: "Названия предметов",
@@ -183,9 +182,9 @@ class MainWindow(QMainWindow):
         values[2] = values[2] / 100
         print(values)
 
-
         task = ComposerTask(self._data, *values)
         self._progress_window = ProgressWindow(self, task)
+        self._progress_window.on_task_finish
         self._progress_window.show()
 
     def _show_orm_window(self, orm_class):
